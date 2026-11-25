@@ -1,11 +1,9 @@
-# Travel-Assignment
-
 # 🌍 Wanderlust — Enterprise Travel & Stays Booking Platform
 
 > A production-grade, luxury travel booking web application built with **Angular 22 (Zoneless + Signals)**, **`@ngrx/signals` (SignalStore)**, **Web Workers** for off-thread filtering of ~1,000 rooms, **Firebase Auth & Firestore**, **PWA offline caching**, and high-performance **Core Web Vitals**.
 
 ### 🔗 Project Links
-- **GitHub Repository**: [https://github.com/aryan-chauhan-nagarro/Travel-Assignment.git](https://github.com/aryan-chauhan-nagarro/Travel-Assignment.git)
+- **GitHub Repository**: [https://github.com/aryan-chauhan-nagarro/Travel-Assignment](https://github.com/aryan-chauhan-nagarro/Travel-Assignment)
 - **Live Deployed Application**: [https://travel-booking-assignment.web.app](https://travel-booking-assignment.web.app) *(or Firebase / Vercel Hosting)*
 
 [![Angular 22](https://img.shields.io/badge/Angular-22.3-DD0031?style=for-the-badge&logo=angular&logoColor=white)](https://angular.dev/)
@@ -60,6 +58,7 @@
 | `/` | Public | **Home Page**: Hero carousel, floating search bar with destination autocomplete, "A Signature of Excellence" grid, and `@defer` category tiles. |
 | `/search` | Public | **Search & Results**: Multi-faceted filter sidebar, Web Worker results count, responsive mobile bottom-sheet filter, and Save Search modal. |
 | `/rooms/:id` | Public | **Room Details**: Responsive photo gallery with full lightbox modal, specifications, cancellation policy, sticky booking card, and `@defer (on viewport)` reviews. |
+| `/favorites` | Public | **My Favorites**: Curated wishlist of saved hotel stays with instant toggle removal and responsive card grid. |
 | `/checkout/:roomId` | `authGuard` | **Checkout**: Inline date & guest editors, Luhn algorithm credit card validation, live card brand detection, and demo autofill. |
 | `/booking-success/:id` | `authGuard` | **Confirmation**: Celebratory confetti, 8-character code with copy button, and `.ics` iCalendar export. |
 | `/my-bookings` | `authGuard` | **My Trips**: Tabbed reservation management (Upcoming, All, Cancelled) with refund policy cancellation flow. |
@@ -94,13 +93,14 @@ The application was systematically audited and optimized to meet elite Core Web 
 
 ## 🎁 Bonus Features
 
-1. **Web Worker Off-Thread Processing**: Fast filtering of 1,024 rooms across 32 properties off the main thread.
+1. **Web Worker Off-Thread Processing**: Fast filtering of 1,024 rooms across 32 properties off the main thread (`room-filter.worker.ts`).
 2. **Saved Searches (`/saved-searches`)**: Save customized filter presets. Features an expired-date warning if saved travel dates have passed, plus 1-click execution that populates URL query parameters.
-3. **RFC 5545 iCalendar (`.ics`) Export**: Generates standard `.ics` calendar invites for Apple Calendar, Google Calendar, and Outlook directly in the browser.
-4. **Confetti Celebration**: Triggers multi-burst celebration animation on reservation confirmation via `canvas-confetti`.
-5. **Luhn Mod-10 Checksum Algorithm**: Validates credit card numbers on the client side with live card brand detection (Visa, Mastercard, Amex) and automatic spacing.
-6. **Admin Management Workspace**: Role-guarded management panel for destinations and hotels with optimistic UI updates and live image previews.
-7. **One-Click Demo Admin Switch**: Dedicated quick-login button on the login screen for evaluators to test admin capabilities instantly.
+3. **Dedicated Favorites Stays (`/favorites`)**: Clean, responsive wishlist gallery for saved stays without cluttering search filter bars.
+4. **RFC 5545 iCalendar (`.ics`) Export**: Generates standard `.ics` calendar invites for Apple Calendar, Google Calendar, and Outlook directly in the browser.
+5. **Confetti Celebration**: Triggers multi-burst celebration animation on reservation confirmation via `canvas-confetti`.
+6. **Luhn Mod-10 Checksum Algorithm**: Validates credit card numbers on the client side with live card brand detection (Visa, Mastercard, Amex) and automatic spacing.
+7. **Admin Management Workspace**: Role-guarded management panel for destinations and hotels with optimistic UI updates and live image previews.
+8. **One-Click Demo Admin Switch**: Dedicated quick-login button on the login screen for evaluators to test admin capabilities instantly.
 
 ---
 
@@ -166,9 +166,9 @@ Test Files  6 passed (6)
 ### Installation
 ```bash
 # 1. Clone repository & install dependencies
-git clone <repository-url>
-cd Travel_Assignment
-npm install
+git clone https://github.com/aryan-chauhan-nagarro/Travel-Assignment.git
+cd Travel-Assignment
+npm install --legacy-peer-deps
 
 # 2. Run local development server
 ng serve
@@ -214,5 +214,3 @@ firebase deploy --only hosting
 ---
 
 *Built with ❤️ using Angular 22, Signals, and Modern Web Standards.*
-#   T r a v e l - A s s i g n m e n t  
- 

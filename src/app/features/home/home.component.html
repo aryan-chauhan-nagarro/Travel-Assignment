@@ -1,0 +1,306 @@
+<div class="home-view">
+  <!-- 1. Hero Section with Carousel & Overlaid Search Bar -->
+  <section class="hero-section" aria-label="Hero banner">
+    <div class="hero-carousel">
+      @for (slide of heroSlides; track slide.id; let idx = $index) {
+        @if (idx === 0 || idx === activeHeroIndex) {
+          <div class="hero-slide" [class.active]="idx === activeHeroIndex">
+            <img
+              [ngSrc]="slide.image"
+              [alt]="slide.title"
+              fill
+              sizes="100vw"
+              [priority]="idx === 0"
+              class="hero-bg-img"
+            />
+            <div class="hero-overlay"></div>
+            <div class="hero-caption">
+              <h1 class="hero-title">{{ slide.title }}</h1>
+              <p class="hero-subtitle">{{ slide.subtitle }}</p>
+            </div>
+          </div>
+        }
+      }
+
+      <!-- Carousel Dots -->
+      <div class="carousel-indicators">
+        @for (slide of heroSlides; track slide.id; let idx = $index) {
+          <button
+            type="button"
+            class="indicator-dot"
+            [class.active]="idx === activeHeroIndex"
+            [attr.aria-label]="'Go to slide ' + (idx + 1)"
+            (click)="setHeroIndex(idx)"
+          ></button>
+        }
+      </div>
+    </div>
+
+    <!-- Overlaid Interactive Search Bar -->
+    <div class="search-bar-wrapper">
+      <div class="search-bar-card">
+        <!-- Location Column with Autocomplete Dropdown -->
+        <div class="search-col location-col" appClickOutside (clickOutside)="locationDropdownOpen = false">
+          <div class="search-input-group" (click)="toggleLocationDropdown()">
+            <label class="col-label" for="destinationInput">Location</label>
+            <input
+              id="destinationInput"
+              type="text"
+              class="col-input"
+              placeholder="Where are you going?"
+              [value]="selectedDestinationName()"
+              (input)="onLocationInput($event)"
+              autocomplete="off"
+            />
+          </div>
+
+          @if (locationDropdownOpen) {
+            <div class="autocomplete-dropdown" role="listbox">
+              <div class="dropdown-header">Destinations</div>
+              @for (dest of filteredDestinations(); track dest.id) {
+                <div
+                  class="autocomplete-item"
+                  role="option"
+                  tabindex="0"
+                  (click)="selectDestination(dest)"
+                >
+                  <div class="dest-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                      <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                  </div>
+                  <div class="dest-meta">
+                    <strong>{{ dest.name }}</strong>
+                    <small>{{ dest.country }} &middot; {{ dest.propertyCount }} stays</small>
+                  </div>
+                </div>
+              }
+              @if (filteredDestinations().length === 0) {
+                <div class="dropdown-empty">No destinations found</div>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="search-divider"></div>
+
+        <!-- Date Range Picker (Check-in & Check-out) -->
+        <div class="search-col dates-col">
+          <app-date-range-picker
+            [checkIn]="checkIn()"
+            [checkOut]="checkOut()"
+            (datesChange)="onDatesChange($event)"
+          />
+        </div>
+
+        <div class="search-divider"></div>
+
+        <!-- Guests Stepper Popover -->
+        <div class="search-col guests-col">
+          <app-guest-picker
+            [initialGuests]="guests()"
+            (guestsChange)="onGuestsChange($event)"
+          />
+        </div>
+
+        <!-- Search CTA Button -->
+        <div class="search-cta-col">
+          <button
+            type="button"
+            class="search-submit-btn"
+            aria-label="Search available stays"
+            (click)="onSearch()"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <span class="btn-text">Search</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. "A Signature of Excellence" Featured Destinations -->
+  <section class="section-container signature-section">
+    <div class="section-header">
+      <h2 class="section-title">A SIGNATURE OF EXCELLENCE</h2>
+      <p class="section-subtitle">Top curated destinations offering unforgettable stays around the world.</p>
+    </div>
+
+    @if (destinationStore.loading()) {
+      <div class="destinations-grid">
+        @for (i of [1,2,3,4]; track i) {
+          <div class="dest-skeleton">
+            <app-skeleton height="200px" borderRadius="12px" variant="card" />
+            <div style="margin-top: 10px;">
+              <app-skeleton height="18px" width="60%" />
+              <app-skeleton height="14px" width="40%" style="margin-top: 6px;" />
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="destinations-grid">
+        @for (dest of featuredDestinations(); track dest.id) {
+          <app-destination-card
+            [destination]="dest"
+            (cardClick)="onDestinationClick(dest)"
+          />
+        }
+      </div>
+    }
+  </section>
+
+  <!-- 3. Category Tiles Grid (Asymmetrical Visual Grid with Deferred Loading) -->
+  @defer (on viewport) {
+    <section class="section-container categories-section">
+      <div class="section-header">
+        <h2 class="section-title">EXPLORE BY CATEGORY</h2>
+        <p class="section-subtitle">Find unique stays curated for your specific travel style.</p>
+      </div>
+
+      <div class="categories-mosaic">
+        <!-- Outdoor getaways -->
+        <a
+          routerLink="/search"
+          [queryParams]="{ type: 'House' }"
+          class="category-tile tile-outdoor"
+        >
+          <img
+            src="https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=400&auto=format&fit=crop&q=60"
+            alt="Outdoor getaways"
+            class="tile-bg"
+            loading="lazy"
+            decoding="async"
+          />
+          <div class="tile-content">
+            <h3 class="tile-title">Outdoor getaways</h3>
+            <span class="tile-count">151 stays</span>
+          </div>
+        </a>
+
+        <!-- Unique destinations -->
+        <a
+          routerLink="/search"
+          [queryParams]="{ type: 'Guesthouse' }"
+          class="category-tile tile-unique"
+        >
+          <img
+            src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&auto=format&fit=crop&q=60"
+            alt="Unique destinations"
+            class="tile-bg"
+            loading="lazy"
+            decoding="async"
+          />
+          <div class="tile-content">
+            <h3 class="tile-title">Unique destinations</h3>
+            <span class="tile-count">707 stays</span>
+          </div>
+        </a>
+
+        <!-- Entire homes -->
+        <a
+          routerLink="/search"
+          [queryParams]="{ type: 'Apartment' }"
+          class="category-tile tile-homes"
+        >
+          <img
+            src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&auto=format&fit=crop&q=60"
+            alt="Entire homes"
+            class="tile-bg"
+            loading="lazy"
+            decoding="async"
+          />
+          <div class="tile-content">
+            <h3 class="tile-title">Entire homes</h3>
+            <span class="tile-count">152 stays</span>
+          </div>
+        </a>
+
+        <!-- Pet allowed -->
+        <a
+          routerLink="/search"
+          [queryParams]="{ type: 'Hotel' }"
+          class="category-tile tile-pets"
+        >
+          <img
+            src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=400&auto=format&fit=crop&q=60"
+            alt="Pet allowed stays"
+            class="tile-bg"
+            loading="lazy"
+            decoding="async"
+          />
+          <div class="tile-content">
+            <h3 class="tile-title">Pet allowed</h3>
+            <span class="tile-count">85 stays</span>
+          </div>
+        </a>
+      </div>
+    </section>
+  } @placeholder {
+    <div style="min-height: 280px;"></div>
+  }
+
+  <!-- 4. "Find New Possibilities" Large Promo Cards with @defer (on viewport) -->
+  <section id="possibilities" class="section-container promo-section">
+    <div class="section-header">
+      <h2 class="section-title">FIND NEW POSSIBILITIES</h2>
+      <p class="section-subtitle">Immerse yourself in extraordinary activities led by expert locals.</p>
+    </div>
+
+    @defer (on viewport) {
+      <div class="promo-grid">
+        <!-- Promo 1 -->
+        <div class="promo-card">
+          <div class="promo-image-box">
+            <img
+              src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&auto=format&fit=crop&q=80"
+              alt="Adventure path for your trip"
+              class="promo-img"
+              loading="lazy"
+            />
+          </div>
+          <div class="promo-content">
+            <h3 class="promo-title">Adventure path for your trip</h3>
+            <p class="promo-desc">Unearth thrilling guided hikes, mountain trails, and culinary expeditions tailored to your spirit.</p>
+            <a routerLink="/search" [queryParams]="{ type: 'Experiences' }" class="btn btn-primary btn-promo">
+              Experiences
+            </a>
+          </div>
+        </div>
+
+        <!-- Promo 2 -->
+        <div class="promo-card">
+          <div class="promo-image-box">
+            <img
+              src="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800&auto=format&fit=crop&q=80"
+              alt="Things to do from home"
+              class="promo-img"
+              loading="lazy"
+            />
+          </div>
+          <div class="promo-content">
+            <h3 class="promo-title">Things to do from home</h3>
+            <p class="promo-desc">Live, interactive video sessions with hosts from around the globe — from pasta-making to meditation.</p>
+            <a routerLink="/search" [queryParams]="{ type: 'Online' }" class="btn btn-secondary btn-promo">
+              Online Experiences
+            </a>
+          </div>
+        </div>
+      </div>
+    } @placeholder {
+      <div class="promo-grid">
+        <app-skeleton height="360px" borderRadius="16px" variant="card" />
+        <app-skeleton height="360px" borderRadius="16px" variant="card" />
+      </div>
+    } @loading (minimum 300ms) {
+      <div class="promo-grid">
+        <app-skeleton height="360px" borderRadius="16px" variant="card" />
+        <app-skeleton height="360px" borderRadius="16px" variant="card" />
+      </div>
+    }
+  </section>
+</div>

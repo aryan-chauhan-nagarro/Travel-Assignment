@@ -1,0 +1,120 @@
+<div class="saved-searches-page">
+  <div class="page-container">
+    <header class="page-header">
+      <div>
+        <h1 class="page-title">Saved Searches</h1>
+        <p class="page-subtitle">Access your favorite trip criteria and rerun complex stay filters in a single click.</p>
+      </div>
+      <a routerLink="/search" class="btn btn-primary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <span>Explore Stays</span>
+      </a>
+    </header>
+
+    @if (loading()) {
+      <div class="loading-state">
+        <p>Loading your saved searches...</p>
+      </div>
+    } @else if (savedSearches().length > 0) {
+      <div class="searches-grid">
+        @for (item of savedSearches(); track item.id) {
+          <article class="search-card">
+            <div class="card-body">
+              <div class="card-top-row">
+                <span class="dest-badge">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                  <span>{{ item.destinationName || getDestinationLabel(item.destinationId) }}</span>
+                </span>
+
+                <button
+                  type="button"
+                  class="btn-delete"
+                  (click)="deleteSearch(item.id)"
+                  title="Remove saved search"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                </button>
+              </div>
+
+              <h2 class="search-name">{{ item.name }}</h2>
+
+              <!-- Dates & Warning -->
+              @if (item.checkIn && item.checkOut) {
+                <div class="dates-row">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                  <span>{{ item.checkIn }} &ndash; {{ item.checkOut }}</span>
+
+                  @if (isDatesExpired(item.checkIn)) {
+                    <span class="warning-pill" title="Saved dates have passed. Running search will prompt for current dates.">
+                      Dates Passed
+                    </span>
+                  }
+                </div>
+              }
+
+              <!-- Filter Tags -->
+              <div class="tags-row">
+                @if (item.guests) {
+                  <span class="filter-tag">
+                    {{ item.guests }} {{ item.guests === 1 ? 'guest' : 'guests' }}
+                  </span>
+                }
+                @for (t of item.filters?.propertyTypes; track t) {
+                  <span class="filter-tag">{{ t }}</span>
+                }
+                @for (a of item.filters?.amenities; track a) {
+                  <span class="filter-tag">{{ a }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="card-footer">
+              <span class="saved-time">Saved recently</span>
+              <button
+                type="button"
+                class="btn-run"
+                (click)="runSearch(item)"
+              >
+                <span>Run Search</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </div>
+          </article>
+        }
+      </div>
+    } @else {
+      <!-- Empty State -->
+      <div class="empty-searches-card">
+        <div class="empty-icon-wrap">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+          </svg>
+        </div>
+        <h2 class="empty-title">No saved searches yet</h2>
+        <p class="empty-desc">
+          When exploring stays in the search view, click <strong>"Save Search"</strong> to bookmark your customized filters, dates, and destination preferences for quick access.
+        </p>
+        <a routerLink="/search" class="btn btn-primary">
+          Browse Stays
+        </a>
+      </div>
+    }
+  </div>
+</div>

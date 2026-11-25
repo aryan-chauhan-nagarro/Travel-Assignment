@@ -1,0 +1,43 @@
+@if (totalPages() > 1) {
+  <nav class="pagination-nav" aria-label="Pagination">
+    <button
+      type="button"
+      class="page-btn page-arrow"
+      [disabled]="currentPage() <= 1"
+      aria-label="Previous page"
+      (click)="selectPage(currentPage() - 1)"
+    >
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+    </button>
+
+    @for (item of pageRange(); track $index) {
+      @if (item === -1) {
+        <span class="page-ellipsis">&hellip;</span>
+      } @else {
+        <button
+          type="button"
+          class="page-btn page-number"
+          [class.active]="item === currentPage()"
+          [attr.aria-current]="item === currentPage() ? 'page' : null"
+          (click)="selectPage(item)"
+        >
+          {{ item }}
+        </button>
+      }
+    }
+
+    <button
+      type="button"
+      class="page-btn page-arrow"
+      [disabled]="currentPage() >= totalPages()"
+      aria-label="Next page"
+      (click)="selectPage(currentPage() + 1)"
+    >
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 18l6-6-6-6"/>
+      </svg>
+    </button>
+  </nav>
+}

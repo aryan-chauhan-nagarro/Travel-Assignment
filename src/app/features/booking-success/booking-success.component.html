@@ -1,0 +1,142 @@
+<div class="success-page">
+  <div class="success-container">
+    @if (booking()) {
+      <!-- 1. Header Celebration -->
+      <div class="success-header">
+        <div class="celebration-badge">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <h1 class="success-title">You're All Booked!</h1>
+        <p class="success-subtitle">
+          Your reservation is confirmed. We've sent a detailed confirmation email and receipt to your inbox.
+        </p>
+      </div>
+
+      <!-- 2. Reservation Code Banner -->
+      <div class="code-banner">
+        <div class="code-info">
+          <span class="code-label">RESERVATION CODE</span>
+          <span class="code-val">{{ booking()!.confirmationCode }}</span>
+        </div>
+        <button
+          type="button"
+          class="btn-copy-code"
+          (click)="copyConfirmationCode()"
+          [class.copied]="copiedCode()"
+        >
+          @if (copiedCode()) {
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>Copied!</span>
+          } @else {
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span>Copy Code</span>
+          }
+        </button>
+      </div>
+
+      <!-- 3. Key Reservation Details Card -->
+      <div class="booking-card">
+        <!-- Hotel & Room Header -->
+        <div class="property-row">
+          @if (booking()!.roomImage) {
+            <img [src]="booking()!.roomImage" [alt]="booking()!.roomTitle || 'Room'" class="property-img" />
+          }
+          <div class="property-meta">
+            <span class="property-hotel">{{ booking()!.hotelName }}</span>
+            <h2 class="property-title">{{ booking()!.roomTitle }}</h2>
+            <p class="property-location">{{ booking()!.address }}, {{ booking()!.destinationName }}</p>
+          </div>
+        </div>
+
+        <div class="card-divider"></div>
+
+        <!-- Check-in & Check-out Date Boxes -->
+        <div class="dates-grid">
+          <div class="date-box">
+            <span class="date-type">CHECK-IN</span>
+            <strong class="date-main">{{ booking()!.checkIn }}</strong>
+            <span class="date-time">From 3:00 PM</span>
+          </div>
+
+          <div class="date-arrow">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </div>
+
+          <div class="date-box">
+            <span class="date-type">CHECK-OUT</span>
+            <strong class="date-main">{{ booking()!.checkOut }}</strong>
+            <span class="date-time">Until 11:00 AM</span>
+          </div>
+        </div>
+
+        <div class="card-divider"></div>
+
+        <!-- Summary Details -->
+        <div class="specs-summary">
+          <div class="spec-item">
+            <span class="spec-label">Duration</span>
+            <span class="spec-val">{{ booking()!.nights }} nights</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Guests</span>
+            <span class="spec-val">{{ booking()!.guests }} {{ booking()!.guests === 1 ? 'guest' : 'guests' }}</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Total Paid</span>
+            <span class="spec-val highlight">{{ booking()!.priceBreakdown.total | currencyFormat }}</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Status</span>
+            <span class="status-pill confirmed">Confirmed</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Quick Actions -->
+      <div class="actions-row">
+        <button
+          type="button"
+          class="btn-action btn-calendar"
+          (click)="downloadCalendar()"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          <span>Add to Calendar (.ics)</span>
+        </button>
+
+        <a routerLink="/my-bookings" class="btn-action btn-secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+          <span>View My Bookings</span>
+        </a>
+
+        <a routerLink="/search" class="btn-action btn-primary">
+          <span>Find Another Stay</span>
+        </a>
+      </div>
+    } @else {
+      <!-- Loading or Not Found State -->
+      <div class="not-found-state">
+        <h2>Loading your confirmation...</h2>
+        <p>Please wait while we retrieve your reservation details.</p>
+        <a routerLink="/" class="btn-action btn-primary">Go to Home</a>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,53 @@
+.destination-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface-card);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+
+  &:hover {
+    transform: translateY(-4px);
+    .dest-img {
+      transform: scale(1.05);
+    }
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 3px var(--color-brand);
+  }
+}
+
+.image-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-section);
+}
+
+.dest-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.dest-content {
+  padding: 12px 4px 4px;
+}
+
+.dest-name {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--color-text-headings);
+  margin-bottom: 2px;
+}
+
+.dest-info {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}

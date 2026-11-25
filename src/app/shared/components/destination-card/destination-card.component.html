@@ -1,0 +1,15 @@
+<div class="destination-card" (click)="onCardClick()" tabindex="0" role="button" [attr.aria-label]="destination().name + ', ' + destination().country">
+  <div class="image-wrapper">
+    <img
+      [src]="destination().image"
+      [alt]="destination().name + ', ' + destination().country"
+      loading="lazy"
+      decoding="async"
+      class="dest-img"
+    />
+  </div>
+  <div class="dest-content">
+    <h3 class="dest-name">{{ destination().name }}</h3>
+    <p class="dest-info">{{ destination().propertyCount | number }} properties &middot; {{ destination().distanceText }}</p>
+  </div>
+</div>

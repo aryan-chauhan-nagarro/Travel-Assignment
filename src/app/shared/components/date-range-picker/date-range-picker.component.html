@@ -1,0 +1,74 @@
+<div class="date-picker-container" appClickOutside (clickOutside)="isOpen = false">
+  <button
+    type="button"
+    class="date-picker-trigger"
+    (click)="toggleOpen()"
+    aria-haspopup="dialog"
+    [attr.aria-expanded]="isOpen"
+  >
+    <div class="date-col">
+      <span class="col-label">Check in</span>
+      <span class="col-value">{{ checkIn() ? formatDate(checkIn()) : 'Add dates' }}</span>
+    </div>
+    <div class="date-separator"></div>
+    <div class="date-col">
+      <span class="col-label">Check out</span>
+      <span class="col-value">{{ checkOut() ? formatDate(checkOut()) : 'Add dates' }}</span>
+    </div>
+  </button>
+
+  @if (isOpen) {
+    <div class="calendar-card" role="dialog" aria-label="Choose dates">
+      <div class="calendar-header">
+        <button
+          type="button"
+          class="cal-nav-btn"
+          [disabled]="isPrevMonthDisabled()"
+          (click)="prevMonth()"
+          aria-label="Previous month"
+        >
+          &larr;
+        </button>
+        <div class="month-title">{{ currentMonthTitle() }}</div>
+        <button
+          type="button"
+          class="cal-nav-btn"
+          (click)="nextMonth()"
+          aria-label="Next month"
+        >
+          &rarr;
+        </button>
+      </div>
+
+      <div class="weekdays-grid">
+        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+      </div>
+
+      <div class="days-grid">
+        @for (day of calendarDays(); track $index) {
+          @if (!day) {
+            <span class="empty-cell"></span>
+          } @else {
+            <button
+              type="button"
+              class="day-btn"
+              [class.selected-start]="isStartDate(day.dateString)"
+              [class.selected-end]="isEndDate(day.dateString)"
+              [class.in-range]="isInRange(day.dateString)"
+              [class.disabled]="day.disabled"
+              [disabled]="day.disabled"
+              (click)="selectDate(day.dateString)"
+            >
+              {{ day.dayNumber }}
+            </button>
+          }
+        }
+      </div>
+
+      <div class="calendar-footer">
+        <button type="button" class="btn btn-sm btn-ghost" (click)="clearDates()">Clear dates</button>
+        <button type="button" class="btn btn-sm btn-primary" (click)="isOpen = false">Done</button>
+      </div>
+    </div>
+  }
+</div>

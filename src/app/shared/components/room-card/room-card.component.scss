@@ -1,0 +1,229 @@
+.room-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-card);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 3px var(--color-brand);
+  }
+
+  &.vertical {
+    flex-direction: column !important;
+    height: 100% !important;
+
+    .carousel-container {
+      width: 100% !important;
+      height: 200px !important;
+      aspect-ratio: auto !important;
+      flex-shrink: 0 !important;
+    }
+
+    .room-content {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .room-title {
+      font-size: 1rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .room-specs,
+    .room-amenities {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .room-footer-row {
+      margin-top: auto;
+      padding-top: 12px;
+    }
+  }
+
+  @media (min-width: 640px) {
+    &:not(.vertical) {
+      flex-direction: row;
+      height: 220px;
+    }
+  }
+}
+
+.carousel-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background-color: var(--color-surface-section);
+
+  @media (min-width: 640px) {
+    width: 300px;
+    height: 100%;
+    aspect-ratio: auto;
+    flex-shrink: 0;
+  }
+}
+
+.carousel-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-pill);
+  background-color: rgba(255, 255, 255, 0.9);
+  color: var(--color-text-headings);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 2;
+
+  &.arrow-prev { left: 8px; }
+  &.arrow-next { right: 8px; }
+
+  &:hover {
+    background-color: #ffffff;
+    transform: translateY(-50%) scale(1.08);
+  }
+}
+
+.carousel-container:hover .carousel-arrow {
+  opacity: 1;
+}
+
+.carousel-dots {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 2;
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-pill);
+    background-color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &.active {
+      width: 16px;
+      background-color: #ffffff;
+    }
+  }
+}
+
+.btn-favorite {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 3;
+  padding: 4px;
+  transition: transform 0.15s ease;
+
+  &:hover {
+    transform: scale(1.15);
+  }
+}
+
+.room-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 20px;
+}
+
+.room-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.room-category {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.room-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-text-headings);
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.room-specs {
+  font-size: 0.875rem;
+  color: var(--color-text-body);
+  margin-bottom: 6px;
+}
+
+.room-amenities {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin-bottom: auto;
+}
+
+.room-footer-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.pricing {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  .price-night {
+    font-size: 1rem;
+    color: var(--color-text-headings);
+    strong {
+      font-size: 1.125rem;
+      font-weight: 700;
+    }
+  }
+
+  .price-total {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+    text-decoration: underline;
+  }
+}

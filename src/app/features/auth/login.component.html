@@ -1,0 +1,430 @@
+<div class="login-page">
+  <div class="login-card">
+    <!-- Header -->
+    <div class="login-header">
+      <div class="brand-badge">
+        <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
+          <circle cx="16" cy="16" r="14" fill="#26D9B0" />
+          <path d="M10 20C10 14 16 10 22 10C22 16 16 22 10 22Z" fill="#1A202C" />
+          <circle cx="16" cy="16" r="4" fill="#FFFFFF" />
+        </svg>
+      </div>
+      <h1 class="login-title">Travel Booking</h1>
+      <p class="login-subtitle">
+        {{ authStore.isAuthenticated() ? 'You are currently signed in.' : 'Sign in to access your bookings, favorites, and profile.' }}
+      </p>
+    </div>
+
+    <!-- Error Alert Banner -->
+    @if (authStore.error()) {
+      <div class="auth-error-banner" role="alert">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span>{{ authStore.error() }}</span>
+      </div>
+    }
+
+    <!-- If user is NOT logged in: Show Tab Switcher + Forms -->
+    @if (!authStore.isAuthenticated()) {
+      <!-- Tab Switcher -->
+      <div class="auth-tabs" role="tablist">
+        <button
+          type="button"
+          class="auth-tab"
+          [class.active]="authMode() === 'signin'"
+          (click)="setAuthMode('signin')"
+          role="tab"
+          [attr.aria-selected]="authMode() === 'signin'"
+        >
+          Sign In
+        </button>
+        <button
+          type="button"
+          class="auth-tab"
+          [class.active]="authMode() === 'signup'"
+          (click)="setAuthMode('signup')"
+          role="tab"
+          [attr.aria-selected]="authMode() === 'signup'"
+        >
+          Create Account
+        </button>
+      </div>
+
+      <!-- 1. SIGN IN FORM -->
+      @if (authMode() === 'signin') {
+        <form [formGroup]="signInForm" (ngSubmit)="onSignInSubmit()" class="auth-form" novalidate>
+          <div class="form-group">
+            <label for="signInEmail">Email Address</label>
+            <div class="input-with-icon">
+              <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+              <input
+                id="signInEmail"
+                type="email"
+                formControlName="email"
+                class="form-control"
+                placeholder="name@example.com"
+                autocomplete="email"
+                [class.is-invalid]="signInForm.get('email')?.touched && signInForm.get('email')?.invalid"
+              />
+            </div>
+            @if (signInForm.get('email')?.touched && signInForm.get('email')?.hasError('required')) {
+              <span class="field-error">Email address is required.</span>
+            }
+            @if (signInForm.get('email')?.touched && signInForm.get('email')?.hasError('email')) {
+              <span class="field-error">Please enter a valid email address.</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <div class="label-row">
+              <label for="signInPassword">Password</label>
+              <button
+                type="button"
+                class="btn-text-link"
+                (click)="fillDemoAdminCredentials()"
+                title="Fill demo credentials"
+              >
+                Use demo account?
+              </button>
+            </div>
+            <div class="input-with-icon">
+              <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              <input
+                id="signInPassword"
+                [type]="showSignInPassword() ? 'text' : 'password'"
+                formControlName="password"
+                class="form-control"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+                [class.is-invalid]="signInForm.get('password')?.touched && signInForm.get('password')?.invalid"
+              />
+              <button
+                type="button"
+                class="btn-password-toggle"
+                (click)="showSignInPassword.set(!showSignInPassword())"
+                [attr.aria-label]="showSignInPassword() ? 'Hide password' : 'Show password'"
+              >
+                @if (showSignInPassword()) {
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                    <line x1="1" y1="1" x2="23" y2="23"/>
+                  </svg>
+                } @else {
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                }
+              </button>
+            </div>
+            @if (signInForm.get('password')?.touched && signInForm.get('password')?.hasError('required')) {
+              <span class="field-error">Password is required.</span>
+            }
+          </div>
+
+          <div class="form-row-checkbox">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="rememberMe" />
+              <span>Remember me</span>
+            </label>
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-primary btn-submit"
+            [disabled]="authStore.loading()"
+          >
+            @if (authStore.loading()) {
+              <span class="spinner-sm"></span>
+              <span>Signing In...</span>
+            } @else {
+              <span>Sign In with Email</span>
+            }
+          </button>
+        </form>
+      }
+
+      <!-- 2. SIGN UP FORM -->
+      @if (authMode() === 'signup') {
+        <form [formGroup]="signUpForm" (ngSubmit)="onSignUpSubmit()" class="auth-form" novalidate>
+          <div class="form-group">
+            <label for="signUpName">Full Name</label>
+            <div class="input-with-icon">
+              <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              <input
+                id="signUpName"
+                type="text"
+                formControlName="fullName"
+                class="form-control"
+                placeholder="e.g. Alex Johnson"
+                autocomplete="name"
+                [class.is-invalid]="signUpForm.get('fullName')?.touched && signUpForm.get('fullName')?.invalid"
+              />
+            </div>
+            @if (signUpForm.get('fullName')?.touched && signUpForm.get('fullName')?.hasError('required')) {
+              <span class="field-error">Full name is required.</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="signUpEmail">Email Address</label>
+            <div class="input-with-icon">
+              <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+              <input
+                id="signUpEmail"
+                type="email"
+                formControlName="email"
+                class="form-control"
+                placeholder="name@example.com"
+                autocomplete="email"
+                [class.is-invalid]="signUpForm.get('email')?.touched && signUpForm.get('email')?.invalid"
+              />
+            </div>
+            @if (signUpForm.get('email')?.touched && signUpForm.get('email')?.hasError('required')) {
+              <span class="field-error">Email address is required.</span>
+            }
+            @if (signUpForm.get('email')?.touched && signUpForm.get('email')?.hasError('email')) {
+              <span class="field-error">Please enter a valid email address.</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="signUpPassword">Password</label>
+            <div class="input-with-icon">
+              <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              <input
+                id="signUpPassword"
+                [type]="showSignUpPassword() ? 'text' : 'password'"
+                formControlName="password"
+                class="form-control"
+                placeholder="Create a strong password (min 6 chars)"
+                autocomplete="new-password"
+                [class.is-invalid]="signUpForm.get('password')?.touched && signUpForm.get('password')?.invalid"
+              />
+              <button
+                type="button"
+                class="btn-password-toggle"
+                (click)="showSignUpPassword.set(!showSignUpPassword())"
+                [attr.aria-label]="showSignUpPassword() ? 'Hide password' : 'Show password'"
+              >
+                @if (showSignUpPassword()) {
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                    <line x1="1" y1="1" x2="23" y2="23"/>
+                  </svg>
+                } @else {
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                }
+              </button>
+            </div>
+            <!-- Password Strength Bar -->
+            @if (signUpForm.get('password')?.value) {
+              <div class="password-strength-bar">
+                <div
+                  class="strength-fill"
+                  [style.width.%]="passwordStrength().score * 25"
+                  [style.background-color]="passwordStrength().color"
+                ></div>
+              </div>
+              <span class="strength-label" [style.color]="passwordStrength().color">
+                {{ passwordStrength().label }}
+              </span>
+            }
+            @if (signUpForm.get('password')?.touched && signUpForm.get('password')?.hasError('minlength')) {
+              <span class="field-error">Password must have at least 6 characters.</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="signUpConfirmPassword">Confirm Password</label>
+            <div class="input-with-icon">
+              <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+              <input
+                id="signUpConfirmPassword"
+                [type]="showSignUpConfirmPassword() ? 'text' : 'password'"
+                formControlName="confirmPassword"
+                class="form-control"
+                placeholder="Repeat your password"
+                autocomplete="new-password"
+                [class.is-invalid]="(signUpForm.get('confirmPassword')?.touched && signUpForm.get('confirmPassword')?.invalid) || signUpPasswordMismatch()"
+              />
+              <button
+                type="button"
+                class="btn-password-toggle"
+                (click)="showSignUpConfirmPassword.set(!showSignUpConfirmPassword())"
+                [attr.aria-label]="showSignUpConfirmPassword() ? 'Hide confirm password' : 'Show confirm password'"
+              >
+                @if (showSignUpConfirmPassword()) {
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                    <line x1="1" y1="1" x2="23" y2="23"/>
+                  </svg>
+                } @else {
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                }
+              </button>
+            </div>
+            @if (signUpPasswordMismatch()) {
+              <span class="field-error">Passwords do not match.</span>
+            }
+          </div>
+
+          <div class="form-row-checkbox">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="agreeTerms" />
+              <span>I agree to the Terms of Service & Privacy Policy</span>
+            </label>
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-primary btn-submit"
+            [disabled]="authStore.loading() || signUpPasswordMismatch()"
+          >
+            @if (authStore.loading()) {
+              <span class="spinner-sm"></span>
+              <span>Creating Account...</span>
+            } @else {
+              <span>Create Account</span>
+            }
+          </button>
+        </form>
+      }
+
+      <!-- OR Divider -->
+      <div class="divider-row">
+        <span class="divider-line"></span>
+        <span class="divider-text">OR SIGN IN WITH SOCIAL</span>
+        <span class="divider-line"></span>
+      </div>
+
+      <!-- Social Logins -->
+      <div class="social-buttons">
+        <button
+          type="button"
+          class="btn-social btn-google"
+          [disabled]="authStore.loading()"
+          (click)="onGoogleLogin()"
+        >
+          <svg class="social-icon" width="22" height="22" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+            <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+          </svg>
+          <span>Continue with Google</span>
+        </button>
+
+        <button
+          type="button"
+          class="btn-social btn-facebook"
+          [disabled]="authStore.loading()"
+          (click)="onFacebookLogin()"
+        >
+          <svg class="social-icon" width="22" height="22" viewBox="0 0 24 24" fill="#1877F2">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+          <span>Continue with Facebook</span>
+        </button>
+      </div>
+
+      <!-- Quick Demo Sign In Options -->
+      <div class="demo-pills-section">
+        <span class="demo-pills-label">Fast Evaluation Demo Accounts:</span>
+        <div class="demo-pills-row">
+          <button type="button" class="btn-demo-pill pill-admin" (click)="onDemoAdminLogin()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <span>1-Click Demo Admin</span>
+          </button>
+          <button type="button" class="btn-demo-pill pill-user" (click)="onDemoUserLogin()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            <span>1-Click Demo User</span>
+          </button>
+        </div>
+      </div>
+    } @else {
+      <!-- If user IS logged in: Show User Info & JWT Details & Logout button -->
+      <div class="user-logged-box">
+        <div class="user-avatar-row">
+          @if (authStore.user()?.photoURL) {
+            <img [src]="authStore.user()?.photoURL" alt="Profile photo" class="logged-avatar" />
+          } @else {
+            <div class="avatar-placeholder">
+              {{ authStore.userName().charAt(0) }}
+            </div>
+          }
+        </div>
+        <h3 class="user-welcome">Welcome, {{ authStore.userName() }}!</h3>
+        <p class="user-email-text">{{ authStore.userEmail() }}</p>
+        <span class="user-role-badge" [class.admin-badge]="authStore.isAdmin()">
+          Role: {{ authStore.role() }}
+        </span>
+
+        <!-- Account Session Card -->
+        <div class="jwt-badge-card">
+          <div class="jwt-header">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <strong>Account Session: Active &amp; Verified</strong>
+          </div>
+          <div class="jwt-body">
+            <div class="jwt-row">
+              <span class="jwt-label">Session Status:</span>
+              <span class="jwt-value jwt-active-pill">Authenticated</span>
+            </div>
+            <div class="jwt-row">
+              <span class="jwt-label">User ID:</span>
+              <span class="jwt-value code-snippet">{{ authStore.user()?.uid }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="logged-actions">
+          @if (authStore.isAdmin()) {
+            <a routerLink="/admin/destinations" class="btn btn-secondary">Admin Dashboard</a>
+          }
+          <button type="button" class="btn btn-primary btn-logout" (click)="onLogout()">
+            Sign Out
+          </button>
+        </div>
+      </div>
+    }
+
+    @if (authStore.loading()) {
+      <div class="loading-overlay">
+        <div class="spinner"></div>
+        <span>Authenticating...</span>
+      </div>
+    }
+  </div>
+</div>

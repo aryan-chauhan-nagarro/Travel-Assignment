@@ -1,0 +1,14 @@
+<app-navbar
+  [currentUser]="authStore.user()"
+  [isAuthenticated]="authStore.isAuthenticated()"
+  [isAdmin]="authStore.isAdmin()"
+  (logout)="authStore.logout()"
+/>
+
+<main class="main-content">
+  <router-outlet />
+</main>
+
+<app-footer />
+
+<app-toast-container />

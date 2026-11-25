@@ -1,0 +1,146 @@
+.main-footer {
+  background-color: var(--color-surface-section);
+  border-top: 1px solid var(--color-border-card);
+  padding: 64px 0 32px;
+  margin-top: auto;
+}
+
+.footer-container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--container-pad);
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 36px;
+  padding-bottom: 48px;
+  border-bottom: 1px solid var(--color-border-card);
+
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: 1fr 1fr 1fr 1.5fr;
+  }
+}
+
+.col-title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--color-text-headings);
+  margin-bottom: 16px;
+}
+
+.col-links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  li a {
+    font-size: 0.875rem;
+    color: var(--color-text-body);
+    transition: color 0.15s ease;
+
+    &:hover {
+      color: var(--color-text-headings);
+      text-decoration: underline;
+    }
+  }
+}
+
+.newsletter-col {
+  .newsletter-sub {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    margin-bottom: 14px;
+  }
+}
+
+.newsletter-form {
+  display: flex;
+  gap: 8px;
+  max-width: 360px;
+}
+
+.newsletter-input {
+  flex: 1;
+  height: 44px;
+  padding: 0 14px;
+  font-size: 0.875rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-card);
+  background-color: var(--color-surface-page);
+  color: var(--color-text-headings);
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-brand);
+  }
+}
+
+.btn-subscribe {
+  height: 44px;
+}
+
+.success-note {
+  font-size: 0.8125rem;
+  color: var(--color-success);
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+.footer-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 24px;
+  align-items: center;
+  justify-content: space-between;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+  }
+}
+
+.bottom-left {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+
+  a:hover {
+    text-decoration: underline;
+  }
+}
+
+.bottom-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.currency-tag {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-headings);
+}
+
+.social-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  a {
+    color: var(--color-text-headings);
+    transition: opacity 0.15s ease;
+
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+}

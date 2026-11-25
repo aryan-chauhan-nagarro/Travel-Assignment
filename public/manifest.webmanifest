@@ -1,0 +1,25 @@
+{
+  "name": "Wanderlust — Travel & Stays Booking",
+  "short_name": "Wanderlust",
+  "description": "Discover destinations, browse premium stays, and book seamlessly with our modern travel platform.",
+  "theme_color": "#26D9B0",
+  "background_color": "#0B1219",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "icons/icon-192x192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512x512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+<div class="guest-picker-container" appClickOutside (clickOutside)="isOpen = false">
+  <button
+    type="button"
+    class="guest-picker-trigger"
+    (click)="toggleOpen()"
+    aria-haspopup="dialog"
+    [attr.aria-expanded]="isOpen"
+  >
+    <div class="trigger-label">Guests</div>
+    <div class="trigger-value">{{ summaryText() }}</div>
+  </button>
+
+  @if (isOpen) {
+    <div class="guest-dropdown-card" role="dialog" aria-label="Select guests">
+      <!-- Adults -->
+      <div class="guest-row">
+        <div class="guest-info">
+          <div class="guest-title">Adults</div>
+          <div class="guest-desc">Ages 13 or above</div>
+        </div>
+        <div class="stepper">
+          <button
+            type="button"
+            class="step-btn"
+            [disabled]="adults() <= 1"
+            (click)="updateAdults(-1)"
+            aria-label="Decrease adults"
+          >
+            -
+          </button>
+          <span class="step-count">{{ adults() }}</span>
+          <button
+            type="button"
+            class="step-btn"
+            [disabled]="totalGuests() >= maxGuests()"
+            (click)="updateAdults(1)"
+            aria-label="Increase adults"
+          >
+            +
+          </button>
+        </div>
+      </div>
+
+      <!-- Children -->
+      <div class="guest-row">
+        <div class="guest-info">
+          <div class="guest-title">Children</div>
+          <div class="guest-desc">Ages 2–12</div>
+        </div>
+        <div class="stepper">
+          <button
+            type="button"
+            class="step-btn"
+            [disabled]="children() <= 0"
+            (click)="updateChildren(-1)"
+            aria-label="Decrease children"
+          >
+            -
+          </button>
+          <span class="step-count">{{ children() }}</span>
+          <button
+            type="button"
+            class="step-btn"
+            [disabled]="totalGuests() >= maxGuests()"
+            (click)="updateChildren(1)"
+            aria-label="Increase children"
+          >
+            +
+          </button>
+        </div>
+      </div>
+
+      <!-- Infants -->
+      <div class="guest-row">
+        <div class="guest-info">
+          <div class="guest-title">Infants</div>
+          <div class="guest-desc">Under 2</div>
+        </div>
+        <div class="stepper">
+          <button
+            type="button"
+            class="step-btn"
+            [disabled]="infants() <= 0"
+            (click)="updateInfants(-1)"
+            aria-label="Decrease infants"
+          >
+            -
+          </button>
+          <span class="step-count">{{ infants() }}</span>
+          <button
+            type="button"
+            class="step-btn"
+            [disabled]="infants() >= 5"
+            (click)="updateInfants(1)"
+            aria-label="Increase infants"
+          >
+            +
+          </button>
+        </div>
+      </div>
+
+      <div class="dropdown-footer">
+        <button type="button" class="btn btn-sm btn-primary" (click)="isOpen = false">
+          Done
+        </button>
+      </div>
+    </div>
+  }
+</div>

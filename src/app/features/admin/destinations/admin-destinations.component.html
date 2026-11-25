@@ -1,0 +1,254 @@
+<div class="admin-page">
+  <div class="admin-container">
+    <!-- Top Admin Header -->
+    <header class="admin-header">
+      <div class="header-left">
+        <div class="badge-admin">Admin Workspace</div>
+        <h1 class="admin-title">Destination Management</h1>
+        <p class="admin-subtitle">Add, edit, or control public visibility of destinations across the platform.</p>
+      </div>
+
+      <div class="header-actions">
+        <button type="button" class="btn btn-primary" (click)="openAddModal()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Add Destination</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Sub-Navigation Tabs -->
+    <nav class="admin-tabs" aria-label="Admin Navigation">
+      <a routerLink="/admin/destinations" routerLinkActive="active" class="tab-item">
+        Destinations ({{ destinationStore.entities().length }})
+      </a>
+      <a routerLink="/admin/hotels" routerLinkActive="active" class="tab-item">
+        Hotels &amp; Properties
+      </a>
+    </nav>
+
+    <!-- Controls Row (Search & Stats) -->
+    <div class="controls-row">
+      <div class="search-input-wrap">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search destinations by name or country..."
+          [value]="searchQuery()"
+          (input)="onSearch($event)"
+        />
+      </div>
+
+      <div class="stats-badge">
+        Showing {{ filteredDestinations().length }} of {{ destinationStore.entities().length }} destinations
+      </div>
+    </div>
+
+    <!-- Destinations Table -->
+    <div class="table-card">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Destination</th>
+            <th>Country</th>
+            <th>Properties</th>
+            <th>Description</th>
+            <th>Visibility</th>
+            <th class="actions-col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (dest of filteredDestinations(); track dest.id) {
+            <tr [class.row-hidden]="!dest.visible">
+              <td class="dest-col">
+                <img [src]="dest.image" [alt]="dest.name" class="dest-thumb" />
+                <span class="dest-name">{{ dest.name }}</span>
+              </td>
+              <td>{{ dest.country }}</td>
+              <td>
+                <span class="count-pill">{{ dest.propertyCount }} stays</span>
+              </td>
+              <td class="desc-col" [title]="dest.description">
+                {{ dest.description }}
+              </td>
+              <td>
+                <!-- Toggle Switch -->
+                <label class="toggle-switch" [title]="dest.visible ? 'Hide from public' : 'Show to public'">
+                  <input
+                    type="checkbox"
+                    [checked]="dest.visible"
+                    (change)="toggleVisibility(dest)"
+                  />
+                  <span class="slider"></span>
+                </label>
+                <span class="toggle-label">{{ dest.visible ? 'Visible' : 'Hidden' }}</span>
+              </td>
+              <td class="actions-col">
+                <div class="action-buttons">
+                  <button
+                    type="button"
+                    class="btn-icon btn-edit"
+                    (click)="openEditModal(dest)"
+                    title="Edit destination"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                  </button>
+
+                  <button
+                    type="button"
+                    class="btn-icon btn-delete"
+                    (click)="openDeleteModal(dest)"
+                    title="Delete destination"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="empty-cell">
+                No destinations match your search.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Add / Edit Modal -->
+  @if (isModalOpen()) {
+    <div class="modal-backdrop" (click)="closeModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <header class="modal-header">
+          <h2 class="modal-title">
+            {{ isEditing() ? 'Edit Destination' : 'Add New Destination' }}
+          </h2>
+          <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close modal">&times;</button>
+        </header>
+
+        <form [formGroup]="destinationForm" (ngSubmit)="saveDestination()">
+          <div class="modal-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="name">Destination Name</label>
+                <input
+                  id="name"
+                  type="text"
+                  formControlName="name"
+                  placeholder="e.g. Kyoto"
+                  class="form-control"
+                  [class.is-invalid]="destinationForm.get('name')?.touched && destinationForm.get('name')?.invalid"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="country">Country</label>
+                <input
+                  id="country"
+                  type="text"
+                  formControlName="country"
+                  placeholder="e.g. Japan"
+                  class="form-control"
+                  [class.is-invalid]="destinationForm.get('country')?.touched && destinationForm.get('country')?.invalid"
+                />
+              </div>
+            </div>
+
+            <!-- Image URL & Live Preview -->
+            <div class="form-group">
+              <label for="image">Cover Image URL</label>
+              <input
+                id="image"
+                type="url"
+                formControlName="image"
+                placeholder="https://images.unsplash.com/..."
+                class="form-control"
+                [class.is-invalid]="destinationForm.get('image')?.touched && destinationForm.get('image')?.invalid"
+              />
+            </div>
+
+            @if (destinationForm.get('image')?.value) {
+              <div class="image-preview-box">
+                <span class="preview-label">Live Preview</span>
+                <img
+                  [src]="destinationForm.get('image')?.value"
+                  alt="Destination preview"
+                  class="preview-img"
+                  (error)="onImgError($event)"
+                />
+              </div>
+            }
+
+            <div class="form-group">
+              <label for="description">Description</label>
+              <textarea
+                id="description"
+                rows="3"
+                formControlName="description"
+                placeholder="Brief summary of why travelers should visit..."
+                class="form-control textarea"
+                [class.is-invalid]="destinationForm.get('description')?.touched && destinationForm.get('description')?.invalid"
+              ></textarea>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="propertyCount">Property Count</label>
+                <input
+                  id="propertyCount"
+                  type="number"
+                  formControlName="propertyCount"
+                  class="form-control"
+                />
+              </div>
+
+              <div class="form-group checkbox-align">
+                <label class="checkbox-label">
+                  <input type="checkbox" formControlName="visible" />
+                  <span>Visible on public site</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <footer class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" [disabled]="destinationStore.loading()">
+              {{ isEditing() ? 'Save Changes' : 'Create Destination' }}
+            </button>
+          </footer>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- Delete Confirmation Dialog -->
+  <app-confirm-dialog
+    [isOpen]="deleteModalOpen()"
+    title="Delete Destination"
+    [message]="
+      'Are you sure you want to permanently delete ' +
+      (selectedDestinationToDelete()?.name || '') +
+      '? This action cannot be undone.'
+    "
+    confirmText="Delete Destination"
+    cancelText="Cancel"
+    [isDestructive]="true"
+    (confirmed)="confirmDelete()"
+    (cancelled)="closeDeleteModal()"
+  />
+</div>

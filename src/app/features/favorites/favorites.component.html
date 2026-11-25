@@ -1,0 +1,58 @@
+<div class="favorites-page">
+  <div class="container">
+    <!-- Header -->
+    <header class="favorites-header">
+      <div class="header-content">
+        <h1 class="page-title">My Saved Favorites</h1>
+        <p class="page-subtitle">Your curated wishlist of luxury stays and hotel rooms across the world.</p>
+      </div>
+
+      @if (favoriteRooms().length > 0) {
+        <div class="header-actions">
+          <span class="count-badge">{{ favoriteRooms().length }} saved stays</span>
+          <button type="button" class="btn btn-secondary btn-clear" (click)="clearAllFavorites()">
+            Clear all
+          </button>
+        </div>
+      }
+    </header>
+
+    <!-- Main Content -->
+    @if (loading()) {
+      <div class="favorites-grid">
+        @for (i of [1, 2, 3, 4]; track i) {
+          <div class="skeleton-card">
+            <app-skeleton height="200px" variant="card" />
+            <div class="skeleton-text-group">
+              <app-skeleton height="20px" width="70%" />
+              <app-skeleton height="16px" width="40%" />
+              <app-skeleton height="18px" width="30%" />
+            </div>
+          </div>
+        }
+      </div>
+    } @else if (favoriteRooms().length > 0) {
+      <div class="favorites-grid">
+        @for (room of favoriteRooms(); track room.id) {
+          <app-room-card
+            [room]="room"
+            [isFavorite]="true"
+            layout="vertical"
+            (roomClick)="onRoomSelect(room)"
+            (favoriteToggle)="onFavoriteToggle(room)"
+          />
+        }
+      </div>
+    } @else {
+      <!-- Empty State -->
+      <div class="empty-state-wrapper">
+        <app-empty-state
+          title="No saved favorites yet"
+          description="Click the heart icon on any stay card or hotel room to save your dream destinations here for easy booking later."
+          actionText="Explore Stays"
+          (actionClicked)="navigateToSearch()"
+        />
+      </div>
+    }
+  </div>
+</div>

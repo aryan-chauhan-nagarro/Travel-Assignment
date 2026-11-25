@@ -1,0 +1,304 @@
+<div class="admin-page">
+  <div class="admin-container">
+    <!-- Top Admin Header -->
+    <header class="admin-header">
+      <div class="header-left">
+        <div class="badge-admin">Admin Workspace</div>
+        <h1 class="admin-title">Hotel &amp; Property Management</h1>
+        <p class="admin-subtitle">Configure hotel listings, destination associations, and guest check-in parameters.</p>
+      </div>
+
+      <div class="header-actions">
+        <button type="button" class="btn btn-primary" (click)="openAddModal()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Add Hotel</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Sub-Navigation Tabs -->
+    <nav class="admin-tabs" aria-label="Admin Navigation">
+      <a routerLink="/admin/destinations" routerLinkActive="active" class="tab-item">
+        Destinations
+      </a>
+      <a routerLink="/admin/hotels" routerLinkActive="active" class="tab-item">
+        Hotels &amp; Properties ({{ hotels().length }})
+      </a>
+    </nav>
+
+    <!-- Controls Row (Filter by Destination & Search) -->
+    <div class="controls-row">
+      <div class="filter-controls">
+        <div class="search-input-wrap">
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Search by hotel name or address..."
+            [value]="searchQuery()"
+            (input)="onSearch($event)"
+          />
+        </div>
+
+        <div class="select-wrap">
+          <select class="dest-select" (change)="onFilterDestination($event)">
+            <option value="all">All Destinations</option>
+            @for (dest of destinationStore.entities(); track dest.id) {
+              <option [value]="dest.id">{{ dest.name }} ({{ dest.country }})</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="stats-badge">
+        Showing {{ filteredHotels().length }} of {{ hotels().length }} properties
+      </div>
+    </div>
+
+    <!-- Hotels Table -->
+    <div class="table-card">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Hotel</th>
+            <th>Destination</th>
+            <th>Address</th>
+            <th>Rating</th>
+            <th>Check-in / Out</th>
+            <th>Visibility</th>
+            <th class="actions-col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (hotel of filteredHotels(); track hotel.id) {
+            <tr [class.row-hidden]="!hotel.visible">
+              <td class="hotel-col">
+                <img [src]="hotel.image" [alt]="hotel.name" class="hotel-thumb" />
+                <span class="hotel-name">{{ hotel.name }}</span>
+              </td>
+              <td>
+                <span class="dest-pill">{{ getDestinationName(hotel.destinationId) }}</span>
+              </td>
+              <td class="address-col" [title]="hotel.address">{{ hotel.address }}</td>
+              <td>
+                <span class="rating-badge">&#9733; {{ hotel.rating }}</span>
+              </td>
+              <td class="times-col">
+                <small>{{ hotel.checkInTime }} / {{ hotel.checkOutTime }}</small>
+              </td>
+              <td>
+                <label class="toggle-switch" [title]="hotel.visible ? 'Hide from users' : 'Show to users'">
+                  <input
+                    type="checkbox"
+                    [checked]="hotel.visible"
+                    (change)="toggleVisibility(hotel)"
+                  />
+                  <span class="slider"></span>
+                </label>
+                <span class="toggle-label">{{ hotel.visible ? 'Visible' : 'Hidden' }}</span>
+              </td>
+              <td class="actions-col">
+                <div class="action-buttons">
+                  <button
+                    type="button"
+                    class="btn-icon btn-edit"
+                    (click)="openEditModal(hotel)"
+                    title="Edit hotel"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                  </button>
+
+                  <button
+                    type="button"
+                    class="btn-icon btn-delete"
+                    (click)="openDeleteModal(hotel)"
+                    title="Delete hotel"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="empty-cell">
+                No hotels match the current filter or search criteria.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Add / Edit Modal -->
+  @if (isModalOpen()) {
+    <div class="modal-backdrop" (click)="closeModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <header class="modal-header">
+          <h2 class="modal-title">
+            {{ isEditing() ? 'Edit Hotel' : 'Add New Hotel' }}
+          </h2>
+          <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close modal">&times;</button>
+        </header>
+
+        <form [formGroup]="hotelForm" (ngSubmit)="saveHotel()">
+          <div class="modal-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="hotelName">Hotel Name</label>
+                <input
+                  id="hotelName"
+                  type="text"
+                  formControlName="name"
+                  placeholder="e.g. Grand Horizon Sanctuary"
+                  class="form-control"
+                  [class.is-invalid]="hotelForm.get('name')?.touched && hotelForm.get('name')?.invalid"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="destinationId">Destination</label>
+                <select id="destinationId" formControlName="destinationId" class="form-control">
+                  @for (d of destinationStore.entities(); track d.id) {
+                    <option [value]="d.id">{{ d.name }} ({{ d.country }})</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="address">Full Address / Street</label>
+              <input
+                id="address"
+                type="text"
+                formControlName="address"
+                placeholder="e.g. 128 Coastal Way, Santorini"
+                class="form-control"
+                [class.is-invalid]="hotelForm.get('address')?.touched && hotelForm.get('address')?.invalid"
+              />
+            </div>
+
+            <!-- Image URL & Live Preview -->
+            <div class="form-group">
+              <label for="hotelImage">Hero Image URL</label>
+              <input
+                id="hotelImage"
+                type="url"
+                formControlName="image"
+                placeholder="https://images.unsplash.com/..."
+                class="form-control"
+                [class.is-invalid]="hotelForm.get('image')?.touched && hotelForm.get('image')?.invalid"
+              />
+            </div>
+
+            @if (hotelForm.get('image')?.value) {
+              <div class="image-preview-box">
+                <span class="preview-label">Live Preview</span>
+                <img
+                  [src]="hotelForm.get('image')?.value"
+                  alt="Hotel preview"
+                  class="preview-img"
+                  (error)="onImgError($event)"
+                />
+              </div>
+            }
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="checkInTime">Check-in Time</label>
+                <input
+                  id="checkInTime"
+                  type="text"
+                  formControlName="checkInTime"
+                  placeholder="3:00 PM"
+                  class="form-control"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="checkOutTime">Check-out Time</label>
+                <input
+                  id="checkOutTime"
+                  type="text"
+                  formControlName="checkOutTime"
+                  placeholder="11:00 AM"
+                  class="form-control"
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="rating">Rating (1.0 &ndash; 5.0)</label>
+                <input
+                  id="rating"
+                  type="number"
+                  step="0.01"
+                  min="1"
+                  max="5"
+                  formControlName="rating"
+                  class="form-control"
+                />
+              </div>
+
+              <div class="form-group checkbox-align">
+                <label class="checkbox-label">
+                  <input type="checkbox" formControlName="visible" />
+                  <span>Visible to guests</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="hotelDesc">Description</label>
+              <textarea
+                id="hotelDesc"
+                rows="3"
+                formControlName="description"
+                placeholder="Overview of this boutique stay..."
+                class="form-control textarea"
+                [class.is-invalid]="hotelForm.get('description')?.touched && hotelForm.get('description')?.invalid"
+              ></textarea>
+            </div>
+          </div>
+
+          <footer class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary">
+              {{ isEditing() ? 'Save Changes' : 'Create Hotel' }}
+            </button>
+          </footer>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- Delete Confirmation Dialog -->
+  <app-confirm-dialog
+    [isOpen]="deleteModalOpen()"
+    title="Delete Hotel"
+    [message]="
+      'Are you sure you want to delete ' +
+      (selectedHotelToDelete()?.name || '') +
+      '? Any associated rooms will no longer be bookable.'
+    "
+    confirmText="Delete Hotel"
+    cancelText="Cancel"
+    [isDestructive]="true"
+    (confirmed)="confirmDelete()"
+    (cancelled)="closeDeleteModal()"
+  />
+</div>

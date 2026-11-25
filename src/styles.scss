@@ -1,0 +1,17 @@
+/* Master Stylesheet */
+@use 'tokens' as *;
+@use 'mixins' as *;
+@use 'reset' as *;
+@use 'typography' as *;
+@use 'utilities' as *;
+
+/* App shell basics */
+app-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main.main-content {
+  flex: 1;
+}

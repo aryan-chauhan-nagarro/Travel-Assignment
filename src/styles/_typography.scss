@@ -1,0 +1,63 @@
+// Typography System
+
+h1, .text-h1 {
+  font-size: 2.5rem; // 40px
+  line-height: 3rem; // 48px
+  font-weight: 700;
+  color: var(--color-text-headings);
+  letter-spacing: -0.02em;
+}
+
+h2, .text-h2 {
+  font-size: 1.75rem; // 28px
+  line-height: 2.25rem; // 36px
+  font-weight: 700;
+  color: var(--color-text-headings);
+  letter-spacing: -0.015em;
+}
+
+h3, .text-h3 {
+  font-size: 1.25rem; // 20px
+  line-height: 1.75rem; // 28px
+  font-weight: 600;
+  color: var(--color-text-headings);
+}
+
+h4, .text-h4 {
+  font-size: 1.125rem; // 18px
+  line-height: 1.5rem; // 24px
+  font-weight: 600;
+  color: var(--color-text-headings);
+}
+
+p, .text-body {
+  font-size: 1rem; // 16px
+  line-height: 1.5rem; // 24px
+  font-weight: 400;
+  color: var(--color-text-body);
+}
+
+.text-body-bold {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text-headings);
+}
+
+.text-small {
+  font-size: 0.875rem; // 14px
+  line-height: 1.25rem; // 20px
+  color: var(--color-text-body);
+}
+
+.text-small-muted {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--color-text-muted);
+}
+
+.text-caption {
+  font-size: 0.75rem; // 12px
+  line-height: 1rem; // 16px
+  color: var(--color-text-muted);
+}

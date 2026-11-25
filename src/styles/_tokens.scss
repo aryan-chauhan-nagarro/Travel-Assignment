@@ -1,0 +1,99 @@
+// Design Tokens for Travel Booking (Airbnb-inspired UI)
+
+// SCSS Variables
+$color-brand: #26D9B0;
+$color-brand-hover: #1FB896;
+$color-primary-dark: #4A5568;
+$color-primary-dark-hover: #2D3748;
+
+$color-text-headings: #1A202C;
+$color-text-body: #4A5568;
+$color-text-muted: #718096;
+
+$color-surface-page: #FFFFFF;
+$color-surface-section: #F7F8FA;
+$color-surface-card: #FFFFFF;
+$color-border-card: #E5E7EB;
+
+$color-success: #2F855A;
+$color-error: #E53E3E;
+$color-warning: #DD6B20;
+$color-star: #F6AD55;
+
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-pill: 999px;
+
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+$shadow-md: 0 6px 16px rgba(0, 0, 0, 0.10);
+$shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.12);
+
+$spacing-4: 4px;
+$spacing-8: 8px;
+$spacing-12: 12px;
+$spacing-16: 16px;
+$spacing-24: 24px;
+$spacing-32: 32px;
+$spacing-48: 48px;
+$spacing-64: 64px;
+
+$container-max-width: 1200px;
+$container-pad-mobile: 16px;
+$container-pad-desktop: 24px;
+
+// CSS Custom Properties for dynamic theme & dark mode support
+:root {
+  --color-brand: #{$color-brand};
+  --color-brand-hover: #{$color-brand-hover};
+  --color-primary-dark: #{$color-primary-dark};
+  --color-primary-dark-hover: #{$color-primary-dark-hover};
+
+  --color-text-headings: #{$color-text-headings};
+  --color-text-body: #{$color-text-body};
+  --color-text-muted: #{$color-text-muted};
+
+  --color-surface-page: #{$color-surface-page};
+  --color-surface-section: #{$color-surface-section};
+  --color-surface-card: #{$color-surface-card};
+  --color-border-card: #{$color-border-card};
+
+  --color-success: #{$color-success};
+  --color-error: #{$color-error};
+  --color-warning: #{$color-warning};
+  --color-star: #{$color-star};
+
+  --radius-sm: #{$radius-sm};
+  --radius-md: #{$radius-md};
+  --radius-pill: #{$radius-pill};
+
+  --shadow-sm: #{$shadow-sm};
+  --shadow-md: #{$shadow-md};
+  --shadow-lg: #{$shadow-lg};
+
+  --font-family-base: 'Manrope', -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+  --container-max-width: #{$container-max-width};
+  --container-pad: #{$container-pad-mobile};
+}
+
+@media (min-width: 768px) {
+  :root {
+    --container-pad: #{$container-pad-desktop};
+  }
+}
+
+// Dark Mode Support
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-text-headings: #F7FAFC;
+    --color-text-body: #E2E8F0;
+    --color-text-muted: #A0AEC0;
+
+    --color-surface-page: #1A202C;
+    --color-surface-section: #2D3748;
+    --color-surface-card: #2D3748;
+    --color-border-card: #4A5568;
+
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.5);
+  }
+}

@@ -1,0 +1,528 @@
+<div class="search-page-container">
+  <!-- 1. Top Compact Summary Bar (Wireframe Page 3) -->
+  <header class="search-summary-bar">
+    <div class="summary-content">
+      <div class="summary-pill" (click)="openEditSearchModal()">
+        <span class="pill-destination font-bold">{{ currentDestinationLabel() }}</span>
+        <span class="pill-dot">&middot;</span>
+        <span class="pill-dates">{{ currentDatesLabel() }}</span>
+        <span class="pill-dot">&middot;</span>
+        <span class="pill-guests">{{ currentGuestsLabel() }}</span>
+        <div class="pill-search-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Mobile Filter Toggle Button -->
+      <button
+        type="button"
+        class="btn btn-secondary btn-mobile-filters"
+        (click)="mobileFiltersOpen = !mobileFiltersOpen"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/>
+          <line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/>
+          <line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/>
+          <line x1="17" y1="16" x2="23" y2="16"/>
+        </svg>
+        <span>Filters</span>
+      </button>
+
+      <!-- Save this search button (Bonus feature) -->
+      <button
+        type="button"
+        class="btn btn-secondary btn-save-search"
+        (click)="openSaveSearchModal()"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+          <polyline points="17 21 17 13 7 13 7 21"/>
+          <polyline points="7 3 7 8 15 8"/>
+        </svg>
+        <span>Save this search</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 2. Main Layout Grid: Left Sidebar + Right Results -->
+  <div class="search-main-grid">
+    <!-- Left Sidebar: Filters -->
+    <aside class="filters-sidebar" [class.mobile-open]="mobileFiltersOpen">
+      <div class="sidebar-header">
+        <h3 class="filters-heading">Filters</h3>
+        <button type="button" class="btn-reset-filters" (click)="onResetFilters()">
+          Clear all
+        </button>
+        <button
+          type="button"
+          class="btn-close-mobile-filters"
+          (click)="mobileFiltersOpen = false"
+        >
+          &times;
+        </button>
+      </div>
+
+      <!-- Filter Section: Property Type -->
+      <div class="filter-group">
+        <div class="group-title" (click)="toggleSection('propertyType')">
+          <span>Property type</span>
+          <span class="group-arrow" [class.open]="sectionsOpen.propertyType">&#9662;</span>
+        </div>
+        @if (sectionsOpen.propertyType) {
+          <div class="group-content">
+            @for (pType of propertyTypeOptions; track pType) {
+              <label class="custom-checkbox">
+                <input
+                  type="checkbox"
+                  [checked]="isPropertyTypeSelected(pType)"
+                  (change)="togglePropertyType(pType)"
+                />
+                <span class="checkmark"></span>
+                <span class="label-text">{{ pType }}</span>
+              </label>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Filter Section: Price Ranges -->
+      <div class="filter-group">
+        <div class="group-title" (click)="toggleSection('price')">
+          <span>Price</span>
+          <span class="group-arrow" [class.open]="sectionsOpen.price">&#9662;</span>
+        </div>
+        @if (sectionsOpen.price) {
+          <div class="group-content">
+            @for (bucket of priceBuckets; track bucket.id) {
+              <label class="custom-checkbox">
+                <input
+                  type="checkbox"
+                  [checked]="isPriceBucketSelected(bucket.id)"
+                  (change)="togglePriceBucket(bucket.id)"
+                />
+                <span class="checkmark"></span>
+                <span class="label-text">{{ bucket.label }}</span>
+              </label>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Filter Section: Rating -->
+      <div class="filter-group">
+        <div class="group-title" (click)="toggleSection('reviews')">
+          <span>Reviews &amp; Ratings</span>
+          <span class="group-arrow" [class.open]="sectionsOpen.reviews">&#9662;</span>
+        </div>
+        @if (sectionsOpen.reviews) {
+          <div class="group-content">
+            <label class="custom-radio">
+              <input
+                type="radio"
+                name="ratingFilter"
+                [checked]="!selectedMinRating"
+                (change)="setMinRating(undefined)"
+              />
+              <span class="radio-mark"></span>
+              <span class="label-text">Any rating</span>
+            </label>
+            <label class="custom-radio">
+              <input
+                type="radio"
+                name="ratingFilter"
+                [checked]="selectedMinRating === 4.8"
+                (change)="setMinRating(4.8)"
+              />
+              <span class="radio-mark"></span>
+              <span class="label-text">4.8+ Exceptional</span>
+            </label>
+            <label class="custom-radio">
+              <input
+                type="radio"
+                name="ratingFilter"
+                [checked]="selectedMinRating === 4.5"
+                (change)="setMinRating(4.5)"
+              />
+              <span class="radio-mark"></span>
+              <span class="label-text">4.5+ Very good</span>
+            </label>
+          </div>
+        }
+      </div>
+
+      <!-- Filter Section: Amenities -->
+      <div class="filter-group">
+        <div class="group-title" (click)="toggleSection('amenities')">
+          <span>Amenities</span>
+          <span class="group-arrow" [class.open]="sectionsOpen.amenities">&#9662;</span>
+        </div>
+        @if (sectionsOpen.amenities) {
+          <div class="group-content">
+            @for (amenity of popularAmenities; track amenity) {
+              <label class="custom-checkbox">
+                <input
+                  type="checkbox"
+                  [checked]="isAmenitySelected(amenity)"
+                  (change)="toggleAmenity(amenity)"
+                />
+                <span class="checkmark"></span>
+                <span class="label-text">{{ amenity }}</span>
+              </label>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Filter Section: Rooms and Beds -->
+      <div class="filter-group">
+        <div class="group-title" (click)="toggleSection('roomsBeds')">
+          <span>Rooms and beds</span>
+          <span class="group-arrow" [class.open]="sectionsOpen.roomsBeds">&#9662;</span>
+        </div>
+        @if (sectionsOpen.roomsBeds) {
+          <div class="group-content">
+            <div class="stepper-filter-row">
+              <span>Min bedrooms</span>
+              <div class="btn-group-pill">
+                <button
+                  type="button"
+                  [class.active]="!selectedMinBedrooms"
+                  (click)="setMinBedrooms(undefined)"
+                >
+                  Any
+                </button>
+                <button
+                  type="button"
+                  [class.active]="selectedMinBedrooms === 1"
+                  (click)="setMinBedrooms(1)"
+                >
+                  1+
+                </button>
+                <button
+                  type="button"
+                  [class.active]="selectedMinBedrooms === 2"
+                  (click)="setMinBedrooms(2)"
+                >
+                  2+
+                </button>
+                <button
+                  type="button"
+                  [class.active]="selectedMinBedrooms === 3"
+                  (click)="setMinBedrooms(3)"
+                >
+                  3+
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="mobile-sidebar-footer">
+        <button
+          type="button"
+          class="btn btn-primary w-full"
+          (click)="mobileFiltersOpen = false"
+        >
+          Show {{ roomStore.totalCount() }} stays
+        </button>
+      </div>
+    </aside>
+
+    <!-- Right Results Column -->
+    <main class="results-main">
+      <!-- Stays Count & Sort Row -->
+      <div class="results-header-row">
+        <div>
+          <h1 class="results-count-title">
+            {{ roomStore.totalCount() }}+ stays in {{ currentDestinationLabel() }}
+          </h1>
+        </div>
+
+        <div class="sort-selector">
+          <label for="sortBySelect" class="sr-only">Sort stays by</label>
+          <select
+            id="sortBySelect"
+            class="sort-dropdown"
+            [value]="roomStore.sortBy()"
+            (change)="onSortChange($event)"
+          >
+            <option value="recommended">Recommended</option>
+            <option value="price_asc">Price: low to high</option>
+            <option value="price_desc">Price: high to low</option>
+            <option value="rating">Top rated</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Loading Skeletons -->
+      @if (roomStore.loading()) {
+        <div class="rooms-list">
+          @for (i of [1,2,3,4,5]; track i) {
+            <div class="room-skeleton-card">
+              <app-skeleton width="300px" height="220px" variant="card" />
+              <div class="skeleton-details">
+                <app-skeleton height="16px" width="35%" />
+                <app-skeleton height="22px" width="75%" style="margin-top: 8px;" />
+                <app-skeleton height="16px" width="50%" style="margin-top: 8px;" />
+                <app-skeleton height="24px" width="30%" style="margin-top: auto;" />
+              </div>
+            </div>
+          }
+        </div>
+      } @else if (roomStore.pageItems().length === 0) {
+        <!-- Empty State -->
+        <app-empty-state
+          title="No stays match your criteria"
+          description="Try broadening your dates, clearing price filters, or choosing a different destination."
+          actionText="Clear all filters"
+          (actionClicked)="onResetFilters()"
+        />
+      } @else {
+        <!-- Room Cards List -->
+        <div class="rooms-list">
+          @for (room of roomStore.pageItems(); track room.id) {
+            <app-room-card
+              [room]="room"
+              [isFavorite]="isFavorite(room.id)"
+              [nights]="calculatedNights()"
+              (roomClick)="onRoomSelect(room)"
+              (favoriteToggle)="onFavoriteToggle(room)"
+            />
+          }
+        </div>
+
+        <!-- Pagination -->
+        @if (roomStore.totalCount() > roomStore.pageSize()) {
+          <app-pagination
+            [currentPage]="roomStore.page()"
+            [totalItems]="roomStore.totalCount()"
+            [pageSize]="roomStore.pageSize()"
+            (pageChange)="onPageChange($event)"
+          />
+        }
+      }
+    </main>
+  </div>
+
+  <!-- Quick Edit Search Modal -->
+  @if (editSearchModalOpen) {
+    <div class="modal-backdrop" (click)="closeEditSearchModal()">
+      <div class="edit-search-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <h3>Edit Search Criteria</h3>
+            <p class="modal-subtitle">Update your destination, dates, or guests</p>
+          </div>
+          <button type="button" class="btn-close" (click)="closeEditSearchModal()" aria-label="Close dialog">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <!-- 1. Destination Section -->
+          <div class="modal-section mb-4">
+            <label class="section-label" for="modalDestinationInput">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              <span>Destination</span>
+            </label>
+            <div class="input-with-clear">
+              <input
+                id="modalDestinationInput"
+                type="text"
+                class="form-control"
+                placeholder="Where to? (e.g. Tokyo, Paris, Bali, New York)"
+                [(ngModel)]="selectedDestinationId"
+              />
+              @if (selectedDestinationId) {
+                <button
+                  type="button"
+                  class="btn-clear-input"
+                  (click)="selectedDestinationId = ''"
+                  title="Clear destination"
+                >
+                  &times;
+                </button>
+              }
+            </div>
+            <!-- Quick Destination Suggestions -->
+            <div class="quick-chips-row mt-2">
+              <span class="chips-label">Popular:</span>
+              @for (item of quickDestinations; track item.label) {
+                <button
+                  type="button"
+                  class="btn-chip"
+                  [class.active]="selectedDestinationId === item.value"
+                  (click)="selectQuickDestination(item.value)"
+                >
+                  {{ item.label }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- 2. Travel Dates Section -->
+          <div class="modal-section mb-4">
+            <div class="section-label-row">
+              <label class="section-label">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                  <line x1="16" y1="2" x2="16" y2="6"/>
+                  <line x1="8" y1="2" x2="8" y2="6"/>
+                  <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                <span>Travel Dates</span>
+              </label>
+              <!-- Quick Preset Shortcuts -->
+              <div class="date-preset-buttons">
+                <button type="button" class="btn-preset" (click)="setPresetDates('weekend')">Weekend</button>
+                <button type="button" class="btn-preset" (click)="setPresetDates('week')">1 Week</button>
+                <button type="button" class="btn-preset" (click)="setPresetDates('twoweeks')">2 Weeks</button>
+                @if (selectedCheckIn || selectedCheckOut) {
+                  <button type="button" class="btn-preset btn-preset-clear" (click)="setPresetDates('clear')">Clear</button>
+                }
+              </div>
+            </div>
+
+            <div class="date-inputs-grid">
+              <div class="date-field">
+                <span class="date-sublabel">Check-in</span>
+                <input
+                  type="date"
+                  class="form-control date-input"
+                  [min]="todayString"
+                  [(ngModel)]="selectedCheckIn"
+                />
+              </div>
+              <div class="date-field">
+                <span class="date-sublabel">Check-out</span>
+                <input
+                  type="date"
+                  class="form-control date-input"
+                  [min]="selectedCheckIn || todayString"
+                  [(ngModel)]="selectedCheckOut"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Guests Section (Direct Inline Steppers) -->
+          <div class="modal-section">
+            <label class="section-label">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              <span>Guests ({{ modalAdults() + modalChildren() }} total)</span>
+            </label>
+
+            <div class="steppers-container">
+              <!-- Adults Stepper -->
+              <div class="stepper-row">
+                <div class="stepper-info">
+                  <span class="stepper-title">Adults</span>
+                  <span class="stepper-desc">Ages 13 or above</span>
+                </div>
+                <div class="stepper-controls">
+                  <button
+                    type="button"
+                    class="btn-stepper"
+                    [disabled]="modalAdults() <= 1"
+                    (click)="decrementAdults()"
+                    aria-label="Decrease adults"
+                  >
+                    &minus;
+                  </button>
+                  <span class="stepper-count">{{ modalAdults() }}</span>
+                  <button
+                    type="button"
+                    class="btn-stepper"
+                    [disabled]="modalAdults() >= 16"
+                    (click)="incrementAdults()"
+                    aria-label="Increase adults"
+                  >
+                    &#43;
+                  </button>
+                </div>
+              </div>
+
+              <!-- Children Stepper -->
+              <div class="stepper-row">
+                <div class="stepper-info">
+                  <span class="stepper-title">Children</span>
+                  <span class="stepper-desc">Ages 0 to 12</span>
+                </div>
+                <div class="stepper-controls">
+                  <button
+                    type="button"
+                    class="btn-stepper"
+                    [disabled]="modalChildren() <= 0"
+                    (click)="decrementChildren()"
+                    aria-label="Decrease children"
+                  >
+                    &minus;
+                  </button>
+                  <span class="stepper-count">{{ modalChildren() }}</span>
+                  <button
+                    type="button"
+                    class="btn-stepper"
+                    [disabled]="modalChildren() >= 10"
+                    (click)="incrementChildren()"
+                    aria-label="Increase children"
+                  >
+                    &#43;
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeEditSearchModal()">Cancel</button>
+          <button type="button" class="btn btn-primary btn-apply" (click)="applyQuickEditSearch()">
+            Apply Search
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Save Search Dialog (Bonus Feature) -->
+  @if (saveSearchModalOpen) {
+    <div class="modal-backdrop" (click)="closeSaveSearchModal()">
+      <div class="edit-search-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Save this Search</h3>
+          <button type="button" class="btn-close" (click)="closeSaveSearchModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p class="text-small text-muted mb-3">
+            Give your search criteria a memorable name to quickly re-run it anytime from your profile.
+          </p>
+          <div class="form-group">
+            <label for="searchNameInput">Search Name</label>
+            <input
+              id="searchNameInput"
+              type="text"
+              class="form-control"
+              placeholder="e.g. Family Summer Vacation"
+              [(ngModel)]="saveSearchName"
+            />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeSaveSearchModal()">Cancel</button>
+          <button type="button" class="btn btn-primary" (click)="confirmSaveSearch()">Save Search</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

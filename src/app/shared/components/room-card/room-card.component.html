@@ -1,0 +1,81 @@
+<article class="room-card" [class.vertical]="layout() === 'vertical'" (click)="onCardClick()" tabindex="0" role="article" [attr.aria-label]="room().title">
+  <!-- Image Carousel -->
+  <div class="carousel-container" (click)="$event.stopPropagation()">
+    <img
+      [src]="room().images[activeImageIndex]"
+      [alt]="room().title"
+      loading="lazy"
+      decoding="async"
+      class="carousel-image"
+    />
+
+    @if (room().images.length > 1) {
+      <button
+        type="button"
+        class="carousel-arrow arrow-prev"
+        aria-label="Previous image"
+        (click)="prevImage($event)"
+      >
+        &#8249;
+      </button>
+      <button
+        type="button"
+        class="carousel-arrow arrow-next"
+        aria-label="Next image"
+        (click)="nextImage($event)"
+      >
+        &#8250;
+      </button>
+
+      <div class="carousel-dots">
+        @for (img of room().images; track $index) {
+          <span
+            class="dot"
+            [class.active]="$index === activeImageIndex"
+            (click)="setImage($index, $event)"
+          ></span>
+        }
+      </div>
+    }
+
+    <!-- Favorite / Save Heart Button -->
+    <button
+      type="button"
+      class="btn-favorite"
+      [class.active]="isFavorite()"
+      [attr.aria-label]="isFavorite() ? 'Remove from favorites' : 'Save to favorites'"
+      (click)="toggleFavorite($event)"
+    >
+      <svg width="22" height="22" viewBox="0 0 24 24" [attr.fill]="isFavorite() ? '#FF385C' : 'rgba(0,0,0,0.4)'" stroke="#FFFFFF" stroke-width="2">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Content Details -->
+  <div class="room-content">
+    <div class="room-header-row">
+      <span class="room-category">{{ room().propertyType }} stay in {{ room().destinationName || 'Destination' }}</span>
+      <app-star-rating [rating]="room().rating" [reviewCount]="room().reviewCount" size="sm" />
+    </div>
+
+    <h3 class="room-title">{{ room().title }}</h3>
+
+    <div class="room-specs">
+      {{ room().maxGuests }} guests &middot; {{ room().bedrooms }} {{ room().bedrooms === 1 ? 'bedroom' : 'bedrooms' }} &middot; {{ room().beds }} beds &middot; {{ room().bathrooms }} bath
+    </div>
+
+    <div class="room-amenities">
+      {{ room().amenities.slice(0, 4).join(' &middot; ') }}
+    </div>
+
+    <div class="room-footer-row">
+      <div class="pricing">
+        <span class="price-night"><strong>{{ room().pricePerNight | currencyFormat }}</strong> / night</span>
+        @if (nights() && nights()! > 1) {
+          <span class="price-total">{{ (room().pricePerNight * nights()!) | currencyFormat }} total</span>
+        }
+      </div>
+    </div>
+  </div>
+</article>

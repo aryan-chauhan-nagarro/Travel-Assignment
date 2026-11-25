@@ -1,0 +1,367 @@
+<div class="checkout-page">
+  <div class="checkout-container">
+    <!-- Top Navigation Header -->
+    <header class="checkout-header">
+      <button type="button" class="back-link" (click)="onBack()" aria-label="Go back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <h1 class="checkout-title">Confirm and Pay</h1>
+    </header>
+
+    <div class="checkout-grid">
+      <!-- LEFT COLUMN: Trip, Guest & Payment Forms -->
+      <main class="checkout-main">
+        <!-- 1. Your Trip Summary & In-place Editors -->
+        <section class="checkout-card trip-section">
+          <h2 class="card-heading">Your trip</h2>
+
+          <!-- Dates Row -->
+          <div class="trip-row">
+            <div class="trip-info">
+              <span class="trip-label">Dates</span>
+              <span class="trip-val">
+                {{ draft().checkIn || 'Not selected' }} &ndash; {{ draft().checkOut || 'Not selected' }}
+                <span class="trip-nights">({{ nights() | nights }})</span>
+              </span>
+            </div>
+            <button
+              type="button"
+              class="btn-edit"
+              (click)="editingDates.set(!editingDates())"
+            >
+              {{ editingDates() ? 'Close' : 'Edit' }}
+            </button>
+          </div>
+
+          @if (editingDates()) {
+            <div class="inline-picker-card">
+              <app-date-range-picker
+                [checkIn]="draft().checkIn"
+                [checkOut]="draft().checkOut"
+                (datesChange)="onDatesUpdated($event)"
+              />
+            </div>
+          }
+
+          <div class="row-divider"></div>
+
+          <!-- Guests Row -->
+          <div class="trip-row">
+            <div class="trip-info">
+              <span class="trip-label">Guests</span>
+              <span class="trip-val">
+                {{ draft().guests }} {{ draft().guests === 1 ? 'guest' : 'guests' }}
+              </span>
+            </div>
+            <button
+              type="button"
+              class="btn-edit"
+              (click)="editingGuests.set(!editingGuests())"
+            >
+              {{ editingGuests() ? 'Close' : 'Edit' }}
+            </button>
+          </div>
+
+          @if (editingGuests()) {
+            <div class="inline-picker-card">
+              <app-guest-picker
+                [initialGuests]="draft().guests"
+                (guestsChange)="onGuestsUpdated($event)"
+              />
+            </div>
+          }
+        </section>
+
+        <!-- 2. Contact Information -->
+        <form [formGroup]="checkoutForm" (ngSubmit)="onPayNow()">
+          <section class="checkout-card contact-section">
+            <h2 class="card-heading">Contact Information</h2>
+            <p class="section-desc">We'll send your booking confirmation and itinerary to these details.</p>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input
+                  id="fullName"
+                  type="text"
+                  formControlName="fullName"
+                  placeholder="e.g. John Doe"
+                  class="form-control"
+                  [class.is-invalid]="checkoutForm.get('fullName')?.touched && checkoutForm.get('fullName')?.invalid"
+                />
+                @if (checkoutForm.get('fullName')?.touched && checkoutForm.get('fullName')?.errors?.['required']) {
+                  <span class="error-msg">Full name is required.</span>
+                }
+              </div>
+
+              <div class="form-group">
+                <label for="email">Email Address</label>
+                <input
+                  id="email"
+                  type="email"
+                  formControlName="email"
+                  placeholder="name@example.com"
+                  class="form-control"
+                  [class.is-invalid]="checkoutForm.get('email')?.touched && checkoutForm.get('email')?.invalid"
+                />
+                @if (checkoutForm.get('email')?.touched && checkoutForm.get('email')?.errors?.['required']) {
+                  <span class="error-msg">Email is required.</span>
+                }
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input
+                  id="phone"
+                  type="tel"
+                  formControlName="phone"
+                  placeholder="+1 (555) 000-0000"
+                  class="form-control"
+                  [class.is-invalid]="checkoutForm.get('phone')?.touched && checkoutForm.get('phone')?.invalid"
+                />
+                @if (checkoutForm.get('phone')?.touched && checkoutForm.get('phone')?.invalid) {
+                  <span class="error-msg">Please enter a valid phone number.</span>
+                }
+              </div>
+            </div>
+          </section>
+
+          <!-- 3. Payment Details -->
+          <section class="checkout-card payment-section">
+            <div class="card-heading-row">
+              <div>
+                <h2 class="card-heading">Payment Method</h2>
+                <p class="section-desc">Safe &amp; encrypted credit/debit card processing.</p>
+              </div>
+              <button
+                type="button"
+                class="btn-demo-card"
+                (click)="fillDemoCard()"
+                title="Fill with valid Luhn test card"
+              >
+                Auto-fill Test Card
+              </button>
+            </div>
+
+            <!-- Card Brand Logos Indicator -->
+            <div class="accepted-cards-row">
+              <span class="cards-label">Accepted Cards:</span>
+              <span class="card-badge" [class.active]="cardBrand() === 'visa'">Visa</span>
+              <span class="card-badge" [class.active]="cardBrand() === 'mastercard'">Mastercard</span>
+              <span class="card-badge" [class.active]="cardBrand() === 'amex'">Amex</span>
+            </div>
+
+            <!-- Card Number -->
+            <div class="form-group">
+              <label for="cardNumber">Card Number</label>
+              <div class="input-with-icon">
+                <input
+                  id="cardNumber"
+                  type="text"
+                  formControlName="cardNumber"
+                  placeholder="4111 2222 3333 4444"
+                  maxlength="19"
+                  (input)="onCardNumberInput($event)"
+                  class="form-control"
+                  [class.is-invalid]="checkoutForm.get('cardNumber')?.touched && checkoutForm.get('cardNumber')?.invalid"
+                />
+                <span class="card-type-icon">
+                  @if (cardBrand() === 'visa') {
+                    <strong class="brand-text visa">VISA</strong>
+                  } @else if (cardBrand() === 'mastercard') {
+                    <strong class="brand-text mc">MC</strong>
+                  } @else if (cardBrand() === 'amex') {
+                    <strong class="brand-text amex">AMEX</strong>
+                  } @else {
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                      <line x1="2" y1="10" x2="22" y2="10"></line>
+                    </svg>
+                  }
+                </span>
+              </div>
+              @if (checkoutForm.get('cardNumber')?.touched && checkoutForm.get('cardNumber')?.errors?.['luhnInvalid']) {
+                <span class="error-msg">Invalid card number (fails Luhn algorithm check).</span>
+              } @else if (checkoutForm.get('cardNumber')?.touched && checkoutForm.get('cardNumber')?.errors?.['required']) {
+                <span class="error-msg">Card number is required.</span>
+              }
+            </div>
+
+            <!-- Cardholder Name -->
+            <div class="form-group">
+              <label for="cardHolder">Name on Card</label>
+              <input
+                id="cardHolder"
+                type="text"
+                formControlName="cardHolder"
+                placeholder="e.g. Alex Morgan"
+                class="form-control"
+                [class.is-invalid]="checkoutForm.get('cardHolder')?.touched && checkoutForm.get('cardHolder')?.invalid"
+              />
+              @if (checkoutForm.get('cardHolder')?.touched && checkoutForm.get('cardHolder')?.invalid) {
+                <span class="error-msg">Cardholder name is required.</span>
+              }
+            </div>
+
+            <!-- Expiry & CVV Row -->
+            <div class="form-row">
+              <div class="form-group">
+                <label for="expiry">Expiration Date</label>
+                <input
+                  id="expiry"
+                  type="text"
+                  formControlName="expiry"
+                  placeholder="MM/YY"
+                  maxlength="5"
+                  (input)="onExpiryInput($event)"
+                  class="form-control"
+                  [class.is-invalid]="checkoutForm.get('expiry')?.touched && checkoutForm.get('expiry')?.invalid"
+                />
+                @if (checkoutForm.get('expiry')?.touched && checkoutForm.get('expiry')?.errors?.['expiryExpired']) {
+                  <span class="error-msg">Card has expired.</span>
+                } @else if (checkoutForm.get('expiry')?.touched && checkoutForm.get('expiry')?.errors?.['expiryInvalid']) {
+                  <span class="error-msg">Enter a valid MM/YY date.</span>
+                }
+              </div>
+
+              <div class="form-group">
+                <label for="cvv">Security Code (CVV)</label>
+                <input
+                  id="cvv"
+                  type="password"
+                  formControlName="cvv"
+                  placeholder="123"
+                  maxlength="4"
+                  (input)="onCvvInput($event)"
+                  class="form-control"
+                  [class.is-invalid]="checkoutForm.get('cvv')?.touched && checkoutForm.get('cvv')?.invalid"
+                />
+                @if (checkoutForm.get('cvv')?.touched && checkoutForm.get('cvv')?.invalid) {
+                  <span class="error-msg">3 or 4 digits required.</span>
+                }
+              </div>
+            </div>
+
+            <div class="checkbox-group">
+              <input type="checkbox" id="saveCard" formControlName="saveCard" />
+              <label for="saveCard">Save this payment method securely for future reservations</label>
+            </div>
+          </section>
+
+          <!-- 4. Cancellation & Ground Rules -->
+          <section class="checkout-card policies-section">
+            <h2 class="card-heading">Cancellation Policy</h2>
+            <p class="policy-text">
+              <strong>Free cancellation up to 48 hours before check-in.</strong> After that, cancel before check-in for a 50% refund, minus the service fee.
+            </p>
+
+            <div class="row-divider"></div>
+
+            <h3 class="sub-heading">Ground Rules</h3>
+            <p class="policy-text">
+              We ask every guest to remember a few simple things: follow the house rules, treat your host's home like your own, and respect quiet hours.
+            </p>
+          </section>
+
+          <!-- Error Alert Banner -->
+          @if (paymentError()) {
+            <div class="error-alert" role="alert">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <span>{{ paymentError() }}</span>
+            </div>
+          }
+
+          <!-- Submit CTA -->
+          <div class="submit-section">
+            <button
+              type="submit"
+              class="btn-pay-now"
+              [disabled]="isProcessing()"
+            >
+              @if (isProcessing()) {
+                <span class="spinner"></span>
+                <span>Authorizing Payment...</span>
+              } @else {
+                <span>Confirm &amp; Pay {{ priceBreakdown().total | currencyFormat }}</span>
+              }
+            </button>
+
+            <div class="ssl-guarantee">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <span>Bank-grade 256-bit SSL encrypted &middot; Zero card data stored locally</span>
+            </div>
+          </div>
+        </form>
+      </main>
+
+      <!-- RIGHT COLUMN: Sticky Order Summary Card -->
+      <aside class="checkout-sidebar">
+        <div class="summary-card">
+          <!-- Room Preview -->
+          <div class="summary-room-header">
+            @if (currentRoom()?.images?.length) {
+              <img
+                [src]="currentRoom()!.images[0]"
+                [alt]="currentRoom()!.title"
+                class="summary-thumb"
+              />
+            }
+            <div class="summary-room-info">
+              <span class="summary-hotel-name">{{ currentHotel()?.name || 'Exclusive Resort' }}</span>
+              <h3 class="summary-room-title">{{ currentRoom()?.title || 'Selected Suite' }}</h3>
+              <div class="summary-rating">
+                <span class="star-icon">&#9733;</span>
+                <span class="rating-num">{{ currentRoom()?.rating || '4.95' }}</span>
+                <span class="reviews-count">({{ currentRoom()?.reviewCount || 128 }} reviews)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <!-- Price Breakdown -->
+          <div class="summary-price-details">
+            <h4 class="price-details-title">Price details</h4>
+
+            <div class="price-row">
+              <span class="price-label">
+                {{ priceBreakdown().nightly | currencyFormat }} &times; {{ nights() | nights }}
+              </span>
+              <span class="price-amount">{{ priceBreakdown().subtotal | currencyFormat }}</span>
+            </div>
+
+            @if (priceBreakdown().discount > 0) {
+              <div class="price-row discount-row">
+                <span class="price-label">Long-stay discount (15%)</span>
+                <span class="price-amount">-{{ priceBreakdown().discount | currencyFormat }}</span>
+              </div>
+            }
+
+            <div class="price-row">
+              <span class="price-label">Service &amp; cleaning fee</span>
+              <span class="price-amount">{{ priceBreakdown().serviceFee | currencyFormat }}</span>
+            </div>
+
+            <div class="summary-divider"></div>
+
+            <div class="price-row total-row">
+              <span class="total-label">Total (INR)</span>
+              <span class="total-amount">{{ priceBreakdown().total | currencyFormat }}</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
